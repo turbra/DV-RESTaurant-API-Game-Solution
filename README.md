@@ -264,3 +264,15 @@ _apt:*:19520:0:99999:7:::
 app:!:19832:0:99999:7:::
 
 ```
+```mermaid
+graph TD;
+    A[Register as Customer] --> B[Upgrade to Employee];
+    B --> C[Craft SSRF attack via menu endpoint];
+    C --> D[Reset and use Chef credentials];
+    D --> E[Discover 'app' user sudo privileges];
+    E --> F[Create file in /root via sudo find];
+    F --> G[Check file creation in /root];
+    G --> H[Dump /etc/shadow file];
+
+    classDef default fill:#E67E22,stroke:#333,stroke-width:2px;
+    class A,B,C,D,E,F,G,H default;
