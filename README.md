@@ -45,7 +45,7 @@ curl -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/admin/stats/dis
 
 {"detail":"Only Chef is authorized to get current disk stats!"}
 ```
-Well that's specific.
+Well that's specific
 
 ### attempt to update role for testuser to Chef
 ```bash
