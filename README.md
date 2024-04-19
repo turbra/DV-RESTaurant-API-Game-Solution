@@ -59,12 +59,14 @@ curl -X PUT http://192.168.1.2:8089/users/update_role \
 
 {"detail":"Only Chef is authorized to add Chef role!"}
 ```
+Fair enough but at least we tried
 
 ## At this point I jump to review the code for any goodies - [app/apis/users/service.py](https://github.com/theowni/Damn-Vulnerable-RESTaurant-API-Game/blob/main/app/apis/users/service.py#L18)
 ```
 # this method allows staff to give Employee role to other users
 # Chef role is restricted
 ```
+This is great news!
 
 ### reviewed the code looks juicy - [app/apis/admin/service.py](https://github.com/theowni/Damn-Vulnerable-RESTaurant-API-Game/blob/main/app/apis/admin/service.py#L20)
 ```
@@ -84,6 +86,7 @@ curl -X PUT http://192.168.1.2:8089/users/update_role \
 
 {"username":"testuser","role":"Employee"}
 ```
+That worked, wow.
 
 ### validate role
 ```bash
