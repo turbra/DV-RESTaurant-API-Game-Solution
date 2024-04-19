@@ -137,7 +137,7 @@ curl -X POST http://192.168.1.2:8089/token \
 {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjaGVmIiwiZXhwIjoxNzEzNTQwMTA1fQ.TQoVX_EOQKzIfjPwgJxxcGwVSfcge7QOVkNCny3wRvA","token_type":"bearer"}
 ```
 
-### authenticate as chef
+### authenticate as Chef
 ```bash
 curl -X GET http://192.168.1.2:8089/profile \
      -H "Authorization: Bearer ${CHEF_TOKEN}"	 
